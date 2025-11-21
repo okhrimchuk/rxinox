@@ -1,5 +1,7 @@
 # Docker Setup for Rxinox
 
+> **⚠️ Disclaimer:** This project was developed using Cursor AI with zero manual coding and is an experimental project. The Docker configuration may not work as expected, may contain bugs, and has not been thoroughly tested. Use at your own risk.
+
 This project is containerized using Docker and Docker Compose.
 
 ## Prerequisites
