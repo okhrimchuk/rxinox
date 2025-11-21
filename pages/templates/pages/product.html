@@ -1,0 +1,440 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}{{ product.name }} - Rxinox{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-page {
+        padding: 2rem 0;
+    }
+    
+    .product-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-top: 2rem;
+    }
+    
+    .product-images {
+        position: relative;
+    }
+    
+    .image-slider {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .slider-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f5f5f5;
+    }
+    
+    .slider-wrapper {
+        display: flex;
+        transition: transform 0.5s ease;
+        height: 100%;
+    }
+    
+    .slider-slide {
+        min-width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .slider-slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    
+    .slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 1rem;
+        cursor: pointer;
+        font-size: 1.5rem;
+        z-index: 10;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+    
+    .slider-nav:hover {
+        background: rgba(0, 0, 0, 0.7);
+    }
+    
+    .slider-nav.prev {
+        left: 10px;
+    }
+    
+    .slider-nav.next {
+        right: 10px;
+    }
+    
+    .slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #333;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .slider-dot.active {
+        background: #333;
+    }
+    
+    .product-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+    
+    .product-code {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .product-price-cart {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fb5642;
+        margin: 0;
+        flex: 0 0 auto;
+    }
+    
+    .product-details {
+        margin-bottom: 2rem;
+    }
+    
+    .product-details h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+    
+    .product-details p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .product-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .meta-item {
+        padding: 0.75rem;
+        background: #f5f5f5;
+        border-radius: 4px;
+    }
+    
+    .meta-item strong {
+        display: block;
+        margin-bottom: 0.25rem;
+        color: #2c3e50;
+    }
+    
+    .meta-item span {
+        color: #666;
+    }
+    
+    .add-to-cart-form {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        flex: 1;
+        min-width: 250px;
+    }
+    
+    .quantity-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 0 0 auto;
+    }
+    
+    .quantity-input-group label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .quantity-input {
+        width: 100px;
+        padding: 0.75rem;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        text-align: center;
+    }
+    
+    .quantity-input:focus {
+        outline: none;
+        border-color: #fb5642;
+    }
+    
+    .quantity-error {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .add-to-cart-btn {
+        padding: 0.75rem 2rem;
+        background: #fb5642;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        margin-top: 1.75rem;
+        white-space: nowrap;
+        align-self: flex-end;
+    }
+    
+    .add-to-cart-btn:hover {
+        background: #e04532;
+    }
+    
+    .add-to-cart-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    @media (max-width: 768px) {
+        .product-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-page">
+    <div class="container">
+        <div class="product-container">
+            <div class="product-images">
+                {% if images %}
+                <div class="image-slider">
+                    <div class="slider-container">
+                        <div class="slider-wrapper" id="sliderWrapper">
+                            {% for image in images %}
+                            <div class="slider-slide">
+                                <img src="{{ image }}" alt="{{ product.name }} - Image {{ forloop.counter }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if images|length > 1 %}
+                        <button class="slider-nav prev" onclick="changeSlide(-1)">‹</button>
+                        <button class="slider-nav next" onclick="changeSlide(1)">›</button>
+                        {% endif %}
+                    </div>
+                    {% if images|length > 1 %}
+                    <div class="slider-dots" id="sliderDots">
+                        {% for image in images %}
+                        <button class="slider-dot {% if forloop.first %}active{% endif %}" onclick="goToSlide({{ forloop.counter0 }})"></button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% elif product.image_url %}
+                <div class="slider-container">
+                    <div class="slider-slide">
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                    </div>
+                </div>
+                {% else %}
+                <div class="slider-container">
+                    <div class="slider-slide">
+                        <p>No hay imagen disponible</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="product-info">
+                <h1 class="product-title">{{ product.name }}</h1>
+                <p class="product-code">Código: {{ product.product_code }}</p>
+                
+                <div class="product-price-cart">
+                    <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+                    
+                    <form class="add-to-cart-form" method="post" id="addToCartForm">
+                        {% csrf_token %}
+                        <div class="quantity-input-group">
+                            <label for="quantity">Cantidad</label>
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                name="quantity" 
+                                class="quantity-input" 
+                                value="1" 
+                                min="1" 
+                                required
+                            >
+                            <span class="quantity-error" id="quantityError" style="display: none;"></span>
+                            {% if error_message %}
+                            <span class="quantity-error" style="display: block; color: #e74c3c;">{{ error_message }}</span>
+                            {% endif %}
+                            {% if success_message %}
+                            <span style="display: block; color: #27ae60; margin-top: 0.5rem;">{{ success_message }}</span>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="add-to-cart-btn" id="addToCartBtn">
+                            Añadir al carrito
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="product-meta">
+                    {% if product.producer %}
+                    <div class="meta-item">
+                        <strong>Fabricante</strong>
+                        <span>{{ product.producer }}</span>
+                    </div>
+                    {% endif %}
+                    {% if product.stock is not None %}
+                    <div class="meta-item">
+                        <strong>Stock</strong>
+                        <span>{{ product.stock }} unidades</span>
+                    </div>
+                    {% endif %}
+                    {% if product.availability %}
+                    <div class="meta-item">
+                        <strong>Disponibilidad</strong>
+                        <span>{{ product.availability }}</span>
+                    </div>
+                    {% endif %}
+                    {% if product.delivery %}
+                    <div class="meta-item">
+                        <strong>Envío</strong>
+                        <span>{{ product.delivery }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if product.description or product.short_description %}
+                <div class="product-details">
+                    <h3>Descripción</h3>
+                    {% if product.short_description %}
+                    <p>{{ product.short_description|safe }}</p>
+                    {% endif %}
+                    {% if product.description %}
+                    <p>{{ product.description|safe }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slider-slide');
+    const totalSlides = slides.length;
+    
+    function updateSlider() {
+        const wrapper = document.getElementById('sliderWrapper');
+        if (wrapper) {
+            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        
+        // Update dots
+        const dots = document.querySelectorAll('.slider-dot');
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+    
+    function changeSlide(direction) {
+        currentSlide += direction;
+        if (currentSlide < 0) {
+            currentSlide = totalSlides - 1;
+        } else if (currentSlide >= totalSlides) {
+            currentSlide = 0;
+        }
+        updateSlider();
+    }
+    
+    function goToSlide(index) {
+        currentSlide = index;
+        updateSlider();
+    }
+    
+    // Form validation
+    const form = document.getElementById('addToCartForm');
+    const quantityInput = document.getElementById('quantity');
+    const quantityError = document.getElementById('quantityError');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    
+    function validateQuantity() {
+        const value = parseInt(quantityInput.value);
+        if (isNaN(value) || value < 1) {
+            quantityError.textContent = 'La cantidad debe ser mayor que 0';
+            quantityError.style.display = 'block';
+            addToCartBtn.disabled = true;
+            return false;
+        } else {
+            quantityError.style.display = 'none';
+            addToCartBtn.disabled = false;
+            return true;
+        }
+    }
+    
+    quantityInput.addEventListener('input', validateQuantity);
+    quantityInput.addEventListener('change', validateQuantity);
+    
+    form.addEventListener('submit', function(e) {
+        if (!validateQuantity()) {
+            e.preventDefault();
+            return false;
+        }
+        // Let form submit normally if validation passes
+    });
+</script>
+{% endblock %}
+

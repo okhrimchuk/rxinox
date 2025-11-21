@@ -1,0 +1,273 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Resumen del Pedido - Rxinox{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-summary-page {
+        padding: 2rem 0;
+    }
+    
+    .order-summary-header {
+        margin-bottom: 2rem;
+    }
+    
+    .order-summary-header h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+        margin-top: 2rem;
+        align-items: start;
+    }
+    
+    .products-column {
+        min-height: 100vh;
+    }
+    
+    .contact-column {
+        position: sticky;
+        top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+    }
+    
+    .summary-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .contact-section {
+        flex: 0 0 auto;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .summary-section h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        overflow-y: auto;
+    }
+    
+    .contact-info-item {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+    
+    .contact-info-label {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .contact-info-value {
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+    
+    .order-items {
+        margin-bottom: 2rem;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .order-item-info {
+        flex: 1;
+    }
+    
+    .order-item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+    
+    .order-item-details {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .order-item-total {
+        font-weight: 600;
+        color: #fb5642;
+        font-size: 1.1rem;
+    }
+    
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 1.5rem 0;
+        margin-top: 1.5rem;
+        border-top: 2px solid #e0e0e0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fb5642;
+    }
+    
+    .submit-order-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+        flex: 0 0 auto;
+    }
+    
+    .submit-order-btn {
+        width: 100%;
+        padding: 1.25rem;
+        background: #fb5642;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        margin-top: 1rem;
+    }
+    
+    .submit-order-btn:hover {
+        background: #e04532;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-top: 1rem;
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+        color: #fb5642;
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 1024px) {
+        .summary-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .contact-column {
+            position: static;
+            max-height: none;
+        }
+        
+        .contact-section {
+            max-height: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-summary-page">
+    <div class="container">
+        <div class="order-summary-header">
+            <h1>Resumen del Pedido</h1>
+            <p>Revise su pedido antes de enviarlo</p>
+        </div>
+        
+        <div class="summary-container">
+            <div class="products-column">
+                <div class="summary-section order-items">
+                    <h2>Artículos del Pedido</h2>
+                    {% for item in cart_items %}
+                    <div class="order-item">
+                        <div class="order-item-info">
+                            <div class="order-item-name">{{ item.product.name }}</div>
+                            <div class="order-item-details">
+                                Código: {{ item.product.product_code }} | 
+                                Cantidad: {{ item.quantity }} | 
+                                Precio unitario: {{ item.unit_price }} {{ item.product.currency }}
+                            </div>
+                        </div>
+                        <div class="order-item-total">
+                            {{ item.item_total }} {{ item.product.currency }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="order-total">
+                        <span>Total del Pedido:</span>
+                        <span>{{ grand_total }} EUR</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="contact-column">
+                <div class="summary-section contact-section">
+                    <h2>Información de Contacto</h2>
+                    <div class="contact-info">
+                        <div class="contact-info-item">
+                            <span class="contact-info-label">Nombre Completo</span>
+                            <span class="contact-info-value">{{ contact_details.first_name }} {{ contact_details.last_name }}</span>
+                        </div>
+                        <div class="contact-info-item">
+                            <span class="contact-info-label">Email</span>
+                            <span class="contact-info-value">{{ contact_details.email }}</span>
+                        </div>
+                        {% if contact_details.business_name %}
+                        <div class="contact-info-item">
+                            <span class="contact-info-label">Empresa</span>
+                            <span class="contact-info-value">{{ contact_details.business_name }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="contact-info-item">
+                            <span class="contact-info-label">Teléfono</span>
+                            <span class="contact-info-value">{{ contact_details.phone_number }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section submit-order-section">
+                    <h2>Confirmar Pedido</h2>
+                    <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                        Revise toda la información antes de enviar su pedido.
+                    </p>
+                    <form method="post" action="{% url 'order_summary_page' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="submit-order-btn" id="submitOrderBtn">
+                            Enviar Pedido
+                        </button>
+                    </form>
+                    <a href="{% url 'checkout_page' %}" class="back-link">
+                        ← Volver a editar información
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Rxinox{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="row">
+        <div class="container">
+            <div class="row new-header">
+                <!-- Column 1: Logo -->
+                <div class="header-column logo-column">
+                    <div class="logo-wrap">
+                        <a href="{% url 'landing_page' %}" title="Inicio" class="link-logo link-logo-img">
+                            <img src="{% static 'images/logo.png' %}" alt="RX INOX" style="max-height: 60px;">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Search bar -->
+                <div class="header-column search-column">
+                    <form class="search-form center" action="#" method="post">
+                        <input type="text" name="search" placeholder="Buscar en el sitio..." value="" class="search-input">
+                    </form>
+                </div>
+
+                <!-- Column 3: Phone number and Cart -->
+                <div class="header-column contact-column">
+                    <div class="phone-info">
+                        <div class="smartphone"></div>
+                        <a href="tel:+330772258700">+33 07 72 25 87 00 - De Lunes a Viernes 8h-17h</a>
+                    </div>
+                    <a href="{% url 'cart_page' %}" title="Carrito" class="cart-link">
+                        <div class="icons shopping-cart">
+                            <div class="count" id="cart-count">{{ cart_count|default:0 }}</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="cgm-mobile-menu">
+                    <span class="mobile-hamburger"></span>
+                </div>
+            </div>
+
+            <div class="menu-header-wrap">
+                <nav class="top-menu">
+                    <ul>
+                        <li class="has-subs">
+                            <a href="{% url 'landing_page' %}" title="Productos" id="headlink8" class="spanhover mainlevel">
+                                Productos
+                            </a>
+                            <div class="submenu">
+                                <ul class="level1">
+                                    {% for category in menu_categories %}
+                                    <li>
+                                        <a href="{% url 'category_page' category.slug %}" class="spanhover">{{ category.name }}</a>
+                                    </li>
+                                    {% empty %}
+                                    <li><a href="{% url 'landing_page' %}" class="spanhover">Ver todas las categorías</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#" title="Ofertas" id="headlink15" class="spanhover mainlevel">
+                                Ofertas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="Productos nuevos" id="headlink12" class="spanhover mainlevel">
+                                Productos nuevos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="Quiénes somos" id="headlink7" class="spanhover mainlevel">
+                                Quiénes somos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="Contacto" id="headlink4" class="spanhover mainlevel">
+                                Contacto
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="Envío" id="headlink6" class="spanhover mainlevel">
+                                Envío
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="Catálogos" id="headlink5" class="spanhover mainlevel">
+                                Catálogos
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Sobre nosotros</h3>
+                    <p>Rxinox - Tu socio de confianza</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p>Email: info@rxinox.com</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Enlaces</h3>
+                    <ul>
+                        <li><a href="{% url 'landing_page' %}">Inicio</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} Rxinox. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Update cart count when page loads
+        function updateCartCount() {
+            // Cart count is already in the template via context processor
+            // This function can be used for AJAX updates if needed
+        }
+        
+        // Listen for messages from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart_updated') {
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
+

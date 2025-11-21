@@ -1,0 +1,27 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Bienvenido - Rxinox{% endblock %}
+
+{% block content %}
+<div class="categories-section">
+    <div class="container">
+        <h2>Categorías de Productos</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{% url 'category_page' category.slug %}" class="category-link">
+                <div class="category-card" {% if category.image_url %}style="background-image: url('{{ category.image_url }}');"{% endif %}>
+                    <div class="category-overlay"></div>
+                    <div class="category-content">
+                        <h3>{{ category.name }}</h3>
+                        <p>{{ category.count }} producto{{ category.count|pluralize }}</p>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <p>No hay categorías disponibles.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,31 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}{{ category_name }} - Rxinox{% endblock %}
+
+{% block content %}
+<div class="products-section">
+    <div class="container">
+        <h2>{{ category_name }}</h2>
+        <p class="product-count">{{ product_count }} producto{{ product_count|pluralize }}</p>
+        <div class="products-grid">
+            {% for product in products %}
+            <a href="{% url 'product_page' category_slug product.get_slug %}" class="product-link">
+                <div class="product-card" {% if product.image_url %}style="background-image: url('{{ product.image_url }}');"{% endif %}>
+                    <div class="product-overlay"></div>
+                    <div class="product-content">
+                        <h3>{{ product.name }}</h3>
+                        <p class="product-code">{{ product.product_code }}</p>
+                        {% if product.price %}
+                        <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <p>No hay productos disponibles en esta categoría.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,337 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Pedido Enviado - Rxinox{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-success-page {
+        padding: 2rem 0;
+        text-align: center;
+    }
+    
+    .success-message {
+        background: white;
+        padding: 3rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: #27ae60;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    .success-message h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .success-message p {
+        font-size: 1.1rem;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+    
+    .order-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+    
+    .order-popup.active {
+        display: flex;
+    }
+    
+    .popup-content {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        position: relative;
+    }
+    
+    .popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .popup-header h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+    
+    .close-btn:hover {
+        background: #f5f5f5;
+    }
+    
+    .popup-section {
+        margin-bottom: 2rem;
+    }
+    
+    .popup-section h3 {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .contact-details {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .contact-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .contact-value {
+        color: #2c3e50;
+    }
+    
+    .order-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .order-items-table th {
+        background: #f5f5f5;
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .order-items-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .order-items-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        margin-top: 1rem;
+        border-top: 2px solid #e0e0e0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #fb5642;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: #fb5642;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #e04532;
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+    
+    @media (max-width: 768px) {
+        .popup-content {
+            padding: 1.5rem;
+            max-width: 95%;
+        }
+        
+        .contact-details {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+        
+        .order-items-table {
+            font-size: 0.875rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-success-page">
+    <div class="container">
+        <div class="success-message">
+            <div class="success-icon">✓</div>
+            <h1>¡Pedido Enviado Exitosamente!</h1>
+            <p>Gracias por su pedido. Hemos recibido su información y procesaremos su pedido pronto.</p>
+            <div class="action-buttons">
+                <a href="{% url 'landing_page' %}" class="btn btn-primary">Volver al Inicio</a>
+                <button onclick="showOrderPopup()" class="btn btn-secondary">Ver Detalles del Pedido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Popup -->
+<div class="order-popup" id="orderPopup">
+    <div class="popup-content">
+        <div class="popup-header">
+            <h2>Detalles del Pedido</h2>
+            <button class="close-btn" onclick="closeOrderPopup()">&times;</button>
+        </div>
+        
+        <div class="popup-section">
+            <h3>Información de Contacto</h3>
+            <div class="contact-details">
+                <div class="contact-label">Nombre:</div>
+                <div class="contact-value">{{ order_data.contact_details.first_name }} {{ order_data.contact_details.last_name }}</div>
+                
+                <div class="contact-label">Email:</div>
+                <div class="contact-value">{{ order_data.contact_details.email }}</div>
+                
+                {% if order_data.contact_details.business_name %}
+                <div class="contact-label">Empresa:</div>
+                <div class="contact-value">{{ order_data.contact_details.business_name }}</div>
+                {% endif %}
+                
+                <div class="contact-label">Teléfono:</div>
+                <div class="contact-value">{{ order_data.contact_details.phone_number }}</div>
+            </div>
+        </div>
+        
+        <div class="popup-section">
+            <h3>Artículos del Pedido</h3>
+            <table class="order-items-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_data.cart_items %}
+                    <tr>
+                        <td>{{ item.product_code }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit_price }} {{ item.currency }}</td>
+                        <td>{{ item.item_total }} {{ item.currency }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="order-total">
+                <span>Total del Pedido:</span>
+                <span>{{ order_data.grand_total }} EUR</span>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="closeOrderPopup()" class="btn btn-primary">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show popup on page load
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            showOrderPopup();
+        }, 500);
+    });
+    
+    function showOrderPopup() {
+        document.getElementById('orderPopup').classList.add('active');
+    }
+    
+    function closeOrderPopup() {
+        document.getElementById('orderPopup').classList.remove('active');
+    }
+    
+    // Close popup when clicking outside
+    document.getElementById('orderPopup').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeOrderPopup();
+        }
+    });
+    
+    // Close popup with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeOrderPopup();
+        }
+    });
+</script>
+{% endblock %}
+
