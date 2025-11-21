@@ -11,16 +11,12 @@ fi
 echo "Collecting static files..."
 python manage.py collectstatic --noinput || true
 
-# Run migrations
+# Run migrations only (catalog loading and image downloading moved to background jobs)
 echo "Running migrations..."
 python manage.py migrate --noinput
 
-# Load catalog data if file exists and database is empty
-if [ -f "catalog-2025.csv" ] && [ ! -f "db_loaded.flag" ]; then
-    echo "Loading catalog data..."
-    python manage.py load_catalog || true
-    touch db_loaded.flag
-fi
+# Background jobs (catalog loading, image downloading) will run automatically
+# after the server starts via Django's AppConfig.ready() method
 
 # Execute command
 exec "$@"

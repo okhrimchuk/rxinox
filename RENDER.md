@@ -53,12 +53,15 @@ The project includes a `render.yaml` file for easy deployment:
    - **Environment**: `Python 3`
    - **Build Command**: 
      ```bash
-     pip install -r requirements.txt && python manage.py collectstatic --noinput
+     pip install -r requirements.txt
      ```
    - **Start Command**:
      ```bash
-     gunicorn rxinox.wsgi:application
+     bash render-start.sh
      ```
+   
+   **Note:** The startup script handles static files collection and migrations.
+   Background jobs (catalog loading, image downloading) run automatically after the server starts.
 
 ### Step 3: Configure Environment Variables
 
