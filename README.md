@@ -70,6 +70,16 @@ cp .env.example .env
 docker-compose up --build
 ```
 
+### Render.com Deployment
+
+For deploying to Render.com, see [RENDER.md](RENDER.md) for detailed instructions.
+
+Quick deploy with Render:
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Create a new Web Service in Render
+3. Connect your repository
+4. Render will automatically detect `render.yaml` configuration
+
 ## Configuration
 
 ### Default Setup (No Secrets Required)

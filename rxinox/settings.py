@@ -4,6 +4,7 @@ Django settings for rxinox project.
 
 from pathlib import Path
 from decouple import config, Csv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files on Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,9 +73,16 @@ WSGI_APPLICATION = 'rxinox.wsgi.application'
 # Database configuration
 # Default to SQLite for development - no secrets required
 # Set DATABASE=postgres in .env to use PostgreSQL
+# Render.com provides DATABASE_URL environment variable
 DATABASE_TYPE = config('DATABASE', default='sqlite')
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DATABASE_TYPE == 'postgres':
+# If DATABASE_URL is provided (e.g., by Render.com), use it
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+elif DATABASE_TYPE == 'postgres':
     # PostgreSQL configuration - requires .env file with credentials
     DATABASES = {
         'default': {
@@ -139,6 +148,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise configuration for static files on Render
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user uploaded content)
 MEDIA_URL = 'media/'
