@@ -150,7 +150,10 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise configuration for static files on Render
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Using basic WhiteNoise storage (no collectstatic required) for faster startup
+# This serves directly from STATICFILES_DIRS without needing collectstatic
+# Background job will optionally run collectstatic later for optimization
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files (user uploaded content)
 MEDIA_URL = 'media/'

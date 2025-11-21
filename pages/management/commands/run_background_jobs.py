@@ -26,6 +26,11 @@ class Command(BaseCommand):
             help='Download category images'
         )
         parser.add_argument(
+            '--collectstatic',
+            action='store_true',
+            help='Collect static files'
+        )
+        parser.add_argument(
             '--all',
             action='store_true',
             help='Run all background jobs'
@@ -55,9 +60,10 @@ class Command(BaseCommand):
         run_all = options.get('all', False)
         load_catalog = options.get('load_catalog', False) or run_all
         download_images = options.get('download_images', False) or run_all
+        collectstatic = options.get('collectstatic', False) or run_all
 
-        if not load_catalog and not download_images:
-            self.stdout.write(self.style.WARNING('No jobs specified. Use --all, --load-catalog, or --download-images'))
+        if not load_catalog and not download_images and not collectstatic:
+            self.stdout.write(self.style.WARNING('No jobs specified. Use --all, --load-catalog, --download-images, or --collectstatic'))
             return
 
         self.stdout.write('Starting background jobs...')
@@ -77,6 +83,14 @@ class Command(BaseCommand):
                 call_command('download_category_images', verbosity=1)
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Failed to download images: {e}'))
+
+        # Run static files collection if requested
+        if collectstatic:
+            self.stdout.write('\n--- Collecting static files ---')
+            try:
+                call_command('collectstatic', '--noinput', verbosity=1)
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Failed to collect static files: {e}'))
 
         self.stdout.write(self.style.SUCCESS('\nBackground jobs completed'))
 

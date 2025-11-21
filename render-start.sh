@@ -12,9 +12,10 @@ echo "=== Render Startup Script ==="
 echo "Waiting for database..."
 python wait_for_db.py || echo "Database wait skipped, continuing..."
 
-# Collect static files (required before starting)
-echo "Collecting static files..."
-python manage.py collectstatic --noinput || echo "Static files collection had issues, continuing..."
+# Collect static files (optional - WhiteNoise can serve from STATICFILES_DIRS directly)
+# Run collectstatic in background after server starts for faster startup
+echo "Skipping static files collection (will run in background)..."
+# Background job will handle collectstatic if needed
 
 # Disable background jobs during migrations to prevent interference
 export DISABLE_BACKGROUND_JOBS=true

@@ -108,6 +108,17 @@ class PagesConfig(AppConfig):
                 call_command('download_category_images', verbosity=0)
             except Exception as e:
                 print(f'Background job: Failed to download images: {e}')
+            
+            # Collect static files (optional - for Django admin static files)
+            # With CompressedStaticFilesStorage, collectstatic is optional
+            # It mainly collects Django admin static files (CSS, JS, images)
+            # Your app's static files are already in git and served directly
+            try:
+                call_command('collectstatic', '--noinput', verbosity=0)
+                print('Background job: Static files collected successfully')
+            except Exception as e:
+                print(f'Background job: Static files collection failed (non-critical): {e}')
+                # Non-critical - WhiteNoise serves from STATICFILES_DIRS directly
                 
         except Exception as e:
             print(f'Background jobs error: {e}')
