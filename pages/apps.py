@@ -14,7 +14,7 @@ class PagesConfig(AppConfig):
         """Start background jobs after server is ready."""
         import sys
         
-        # Skip if DISABLE_BACKGROUND_JOBS is set
+        # Skip if DISABLE_BACKGROUND_JOBS is set (e.g., during migrations)
         if os.environ.get('DISABLE_BACKGROUND_JOBS') == 'true':
             return
         
@@ -23,28 +23,53 @@ class PagesConfig(AppConfig):
             return
         
         # Check if we're running a management command (skip background jobs)
-        if len(sys.argv) > 1 and sys.argv[1] in ['migrate', 'makemigrations', 'collectstatic', 'load_catalog', 'download_category_images', 'createsuperuser', 'shell', 'test', 'run_background_jobs']:
-            return
+        # This includes migrate, makemigrations, collectstatic, etc.
+        if len(sys.argv) > 1:
+            cmd = sys.argv[1]
+            management_commands = [
+                'migrate', 'makemigrations', 'collectstatic', 'load_catalog',
+                'download_category_images', 'createsuperuser', 'shell', 'test',
+                'run_background_jobs', 'check', 'flush', 'dbshell', 'dumpdata',
+                'loaddata', 'diffsettings', 'inspectdb'
+            ]
+            if cmd in management_commands:
+                return
         
-        # Only run background jobs in WSGI/ASGI mode or runserver
-        # Detection methods:
-        # 1. Check for runserver in sys.argv (development)
-        # 2. Check if this is WSGI mode (production - gunicorn/uwsgi)
-        #    In WSGI mode, sys.argv won't have 'gunicorn', but Django is loaded differently
-        # 3. Check for WSGI_APPLICATION in environment
-        # 4. Check if we're in a production-like environment
-        
-        is_runserver = 'runserver' in ' '.join(sys.argv)
-        is_wsgi_mode = (
-            os.environ.get('WSGI_APPLICATION') is not None or
-            'gunicorn' in ' '.join(sys.argv) or
-            'uwsgi' in ' '.join(sys.argv) or
-            # If no management command is detected and we're not in a test environment
-            (len(sys.argv) == 1 and not os.environ.get('PYTEST_CURRENT_TEST'))
-        )
-        
-        # Only run if it's a server (runserver or WSGI), not a management command
-        if not (is_runserver or is_wsgi_mode):
+        # Only run background jobs when actually running a server
+        # Detection: look for runserver or if this is being called from WSGI
+        # In WSGI mode, sys.argv typically won't have command arguments
+        # but Django will be loaded via wsgi.py
+        try:
+            # Check if this is a server invocation
+            is_runserver = 'runserver' in ' '.join(sys.argv) if sys.argv else False
+            
+            # Check if we're in WSGI context
+            # WSGI apps are loaded differently - we check if we're being imported
+            # by wsgi.py or if we detect WSGI environment
+            import inspect
+            frame = inspect.currentframe()
+            wsgi_context = False
+            while frame:
+                filename = frame.f_code.co_filename
+                if 'wsgi.py' in filename or 'asgi.py' in filename:
+                    wsgi_context = True
+                    break
+                frame = frame.f_back
+            
+            # Also check environment variables that indicate WSGI mode
+            is_wsgi_mode = (
+                wsgi_context or
+                os.environ.get('WSGI_APPLICATION') is not None or
+                'gunicorn' in ' '.join(sys.argv) if sys.argv else False or
+                'uwsgi' in ' '.join(sys.argv) if sys.argv else False
+            )
+            
+            # Only start background jobs if we're actually running a server
+            if not (is_runserver or is_wsgi_mode):
+                return
+            
+        except Exception:
+            # If detection fails, err on the side of caution and don't run
             return
         
         PagesConfig._background_jobs_started = True
